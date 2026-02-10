@@ -4,3 +4,4 @@ torch==2.5.0
 sentence-transformers==2.6.1
 faiss-cpu==1.13.2
 nltk==3.9.1
+gradio==4.44.0
