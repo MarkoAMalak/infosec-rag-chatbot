@@ -104,5 +104,8 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
         outputs=[answer, context_box]
     )
 
-if __name__ == "__main__":
-    demo.launch()
+demo.launch(
+    server_name="0.0.0.0",
+    server_port=7860,
+    share=True
+)
