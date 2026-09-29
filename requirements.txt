@@ -5,3 +5,5 @@ sentence-transformers==2.6.1
 faiss-cpu==1.13.2
 nltk==3.9.1
 gradio==4.29.0
+fastapi==0.111.0
+pydantic==2.10.6
