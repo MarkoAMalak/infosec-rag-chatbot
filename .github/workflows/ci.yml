@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install
+        run: |
+          pip install -r requirements.txt
+          pip install pip-audit
+      - name: Dependency audit
+        run: pip-audit -r requirements.txt
+      - name: RAG answers a question
+        run: |
+          python - <<'PY'
+          import app
+          answer, context = app.answer_question("What is phishing?")
+          print("ANSWER:", answer)
+          assert answer and context, "empty answer or context"
+          PY
+      - name: App starts
+        run: |
+          PORT=7860 python app.py > app.log 2>&1 &
+          for i in $(seq 1 60); do curl -sf http://127.0.0.1:7860/ > /dev/null && exit 0; sleep 3; done
+          cat app.log; exit 1

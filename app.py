@@ -4,7 +4,7 @@ import faiss
 import gradio as gr
 import numpy as np
 from sentence_transformers import SentenceTransformer
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, pipeline
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
 # =========================
 # Load knowledge base
@@ -35,12 +35,14 @@ MODEL_NAME = "google/flan-t5-base"
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_NAME)
 
-generator = pipeline(
-    "text2text-generation",
-    model=model,
-    tokenizer=tokenizer,
-    max_length=256,
-)
+model.eval()
+
+
+def generate(prompt):
+    """Run FLAN-T5 directly (the text2text pipeline was removed in transformers 5)."""
+    inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=512)
+    output = model.generate(**inputs, max_new_tokens=256)
+    return tokenizer.decode(output[0], skip_special_tokens=True)
 
 
 # =========================
@@ -69,7 +71,7 @@ Question:
 Answer:
 """
 
-    result = generator(prompt)[0]["generated_text"]
+    result = generate(prompt)
 
     return result.strip(), context
 
@@ -77,7 +79,7 @@ Answer:
 # =========================
 # Gradio UI
 # =========================
-with gr.Blocks(theme=gr.themes.Soft()) as demo:
+with gr.Blocks() as demo:
     gr.Markdown(
         """
         # 🔐 Information Security Assistant
@@ -105,4 +107,5 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
     question.submit(fn=answer_question, inputs=question, outputs=[answer, context_box])
 
 if __name__ == "__main__":
-    demo.launch(server_name="0.0.0.0", server_port=int(os.environ.get("PORT", 7860)))
+    demo.launch(server_name="0.0.0.0", server_port=int(os.environ.get("PORT", 7860)),
+                theme=gr.themes.Soft())

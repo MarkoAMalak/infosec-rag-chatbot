@@ -1,5 +1,7 @@
 # 🔐 Information Security RAG Chatbot
 
+[![CI](https://github.com/MarkoAMalak/infosec-rag-chatbot/actions/workflows/ci.yml/badge.svg)](https://github.com/MarkoAMalak/infosec-rag-chatbot/actions/workflows/ci.yml)
+
 An educational chatbot that answers **information security** questions using
 **Retrieval-Augmented Generation (RAG)**. Answers are grounded in a curated
 security knowledge base, and the retrieved context is shown next to each answer.
@@ -40,6 +42,9 @@ Python · FAISS · Sentence-Transformers · Hugging Face Transformers (FLAN-T5) 
 
 ## Notes
 
-- `fastapi` and `pydantic` are pinned because newer releases are incompatible with
-  Gradio 4.29 and caused an *Internal Server Error* on the main page.
-- Developed as a team project.
+- Dependencies were upgraded to Gradio 6, Transformers 5 and PyTorch 2.14 (CPU build).
+  The old pins (Gradio 4.29, Transformers 4.41, Torch 2.5) carried more than 200 published
+  security advisories. Generation now calls `model.generate` directly, because the
+  `text2text-generation` pipeline was removed in Transformers 5.
+- CI checks the dependencies with pip-audit, runs a real RAG query and starts the app.
+- Developed as a team project. Maintained by Marko A. Malak. [MIT License](LICENSE).
